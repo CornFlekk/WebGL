@@ -4,10 +4,35 @@
         <meta charset="utf-8" />
         <title>Shaderz</title>
         <link rel="stylesheet" href="style.css">
-        <script src="webglDemo.js"></script>
+        <!--Libreria per applicare le shader al bg-->
+        <script src="https://xemantic.github.io/shader-web-background/dist/shader-web-background.min.js"></script>
+        <!--Codice delle shader-->
+        <script type="x-shader/x-fragment" id="bgshader" src = "xshad.js">
+            precision mediump float;
+
+            uniform float uTime;
+
+            vec4 red() {
+                return vec4(1.0,0.0,0.0,1.0);
+            }
+
+            void main() {
+                gl_FragColor = red();
+            }            
+        </script>
+        <script>
+            shaderWebBackground.shade({
+              shaders: {
+                bgshader: {
+                  uniforms: {
+                    uTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000)
+                  }
+                }
+              }
+            });
+          </script>
     </head>
     <body>
-        <div class="ov"><canvas id="glcanvas"></canvas></div>
+        <h1 style="font:50px Arial, Helvetica, sans-serif; color: white;">Ciao Mondo</h1>
     </body>
-    <script src="createCanvas.js"></script>
 </html>
