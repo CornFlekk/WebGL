@@ -11,13 +11,11 @@
             precision mediump float;
 
             uniform float uTime;
-
-            vec4 red() {
-                return vec4(1.0,0.0,0.0,1.0);
-            }
+            uniform float uResolution;
 
             void main() {
-                gl_FragColor = red();
+                vec2 st = gl_FragCoord.xy/uResolution;
+                gl_FragColor = vec4(st.x, st.y, 0.0, 1.0);
             }            
         </script>
         <script>
@@ -25,7 +23,8 @@
               shaders: {
                 bgshader: {
                   uniforms: {
-                    uTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000)
+                    uTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
+                    uResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height)
                   }
                 }
               }
