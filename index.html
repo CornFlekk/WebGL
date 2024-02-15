@@ -8,14 +8,16 @@
         <script src="https://xemantic.github.io/shader-web-background/dist/shader-web-background.min.js"></script>
         <!--Codice delle shader-->
         <script type="x-shader/x-fragment" id="bgshader" src = "xshad.js">
-            precision mediump float;
+          #ifdef GL_OES_standard_derivatives
+            #extension GL_OES_standard_derivatives : enable
+          #endif  
+          precision mediump float;
 
             uniform float uTime;
             uniform float uResolution;
-
             void main() {
-                vec2 st = gl_FragCoord.xy/uResolution;
-                gl_FragColor = vec4(st.x, st.y, 0.0, 1.0);
+                vec2 uv = (gl_FragCoord.xy * 2.0 - uResolution.xy) / uResolution.y;
+                gl_FragColor = vec4(abs(uv.x), abs(uv.y), uv.x/uv.y, 1.0);
             }            
         </script>
         <script>
@@ -24,7 +26,7 @@
                 bgshader: {
                   uniforms: {
                     uTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
-                    uResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height)
+                    uResolution: (gl, loc, ctx) => gl.uniform1f(loc, ctx.width, ctx.height)
                   }
                 }
               }
