@@ -8,18 +8,29 @@
         <script src="https://xemantic.github.io/shader-web-background/dist/shader-web-background.min.js"></script>
         <!--Codice delle shader-->
         <script type="x-shader/x-fragment" id="bgshader">
-          #ifdef GL_OES_standard_derivatives
-            #extension GL_OES_standard_derivatives : enable
+          #ifdef GL_ES
+            precision mediump float;
           #endif
-
-          precision mediump float;
+          #define PI 3.14159265359
 
           uniform float iTime;
-          uniform float iResolution;
+          uniform vec2 iResolution;
+
+          float plot(vec2 st, float pct) {
+            return  smoothstep( pct-1., pct+0.2, st.y)-smoothstep( pct, pct+0.1, st.y);
+          }
 
           void main() {
-            vec2 st = (2.* gl_FragCoord.xy - iResolution) / iMinDimension;
-            gl_FragColor = vec4(st.x, st.y, 0.0, 1.0);
+            vec2 st = gl_FragCoord.xy/iResolution;
+
+            float y = 1.-pow(abs(st.x-0.5)*2.,0.5);
+
+            vec3 color = vec3(y);
+
+            float pct = plot(st, y);
+            color = (0.85-pct)*color+pct*vec3(abs(sin(st.x+iTime)),abs(sin(st.y+1.+iTime)),abs(sin(st.xy+2.+iTime)));
+
+            gl_FragColor = vec4(color, 1.0);
           }        
         </script>
         <script>
@@ -29,7 +40,6 @@
                   uniforms: {
                     iTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
                     iResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height),
-                    iMinDimension: () => minDimension
                   }
                 }
               }
