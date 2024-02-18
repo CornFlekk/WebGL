@@ -21,14 +21,19 @@
             return  smoothstep( pct-3., pct, st.y)-smoothstep( pct, pct+0.005, st.y);
           }
 
+          float easeInOutCirc(float x) {
+              return x < 0.5 ? (1.0 - sqrt(1.0 - pow(2.0 * x, 2.0))) / 2.0 : (sqrt(1.0 - pow(-2.0 * x + 2.0, 2.0)) + 1.0) / 2.0;
+          }
+
           void main() {
             vec2 st = gl_FragCoord.xy/iResolution;
 
-            float y = pow(cos((PI*(st.x*2.-1.)/2.)),e);
-
-            vec3 color = vec3(0.);
+            float y = pow(cos((PI*(st.x*2.-1.)/2.))*abs(sin(iTime)),e);
 
             float pct = plot(st, y);
+            float colchange = easeInOutCirc(abs(sin(iTime)));
+
+            vec3 color = mix(vec3(0.7,0.7,0.7),vec3(0.,0.,0.), colchange);
             color = (0.85-pct)*color+pct*vec3(abs(sin(st.x+iTime)),abs(sin(st.y+1.+iTime)),abs(sin(st.xy+2.+iTime)));
 
             gl_FragColor = vec4(color, 1.0);
