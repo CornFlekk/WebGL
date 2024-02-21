@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="html">
+    <head>
+        <meta charset="utf-8" />
+        <title>Shaderz</title>
+        <link rel="stylesheet" href="style.css">
+        <!--Libreria per applicare le shader al bg-->
+        <script src="https://xemantic.github.io/shader-web-background/dist/shader-web-background.min.js"></script>
+        <!--Codice delle shader-->
+        <script type="x-shader/x-fragment" id="bgshader">
+          #ifdef GL_ES
+          precision mediump float;
+          #endif
+          
+          #define PI 3.14159265359
+          
+          uniform vec2 iResolution;
+          uniform float iTime;
+          
+          vec3 colorA = vec3(0.06,0.4,0.5);
+          vec3 colorB = vec3(1.,0.9,0.60);
+          
+          float plot (vec2 st, float pct){
+            return  smoothstep( pct-0.01, pct, st.y) -
+                    smoothstep( pct, pct+0.01, st.y);
+          }
+          
+          void main() {
+              vec2 st = gl_FragCoord.xy/iResolution.xy;
+              vec3 color = vec3(0.0);
+          
+              vec3 pct = vec3(st.x);
+          
+              pct.r = smoothstep(0.0,1.0, st.x);
+              pct.g = smoothstep(0.0,1.0, st.x)*0.4+(1.-(sin(st.x+1.2)));
+              pct.b = smoothstep(1., 0., st.x);
+          
+              color = mix(colorA, colorB, pct*1.2);
+          
+              // Plot transition lines for each channel
+              color = mix(color,vec3(1.0,0.0,0.0),plot(st,pct.r));
+              color = mix(color,vec3(0.0,1.0,0.0),plot(st,pct.g));
+              color = mix(color,vec3(0.0,0.0,1.0),plot(st,pct.b));
+          
+              gl_FragColor = vec4(color,1.0);
+          }                
+        </script>
+        <script>
+            shaderWebBackground.shade({
+              shaders: {
+                bgshader: {
+                  uniforms: {
+                    iTime: (gl, loc) => gl.uniform1f(loc, performance.now() / 1000),
+                    iResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height),
+                  }
+                }
+              }
+            });
+          </script>
+    </head>
+    <body>
+        <h1 style="font:50px Arial, Helvetica, sans-serif; color: white;">Ciao Mondo</h1>
+    </body>
+</html>
